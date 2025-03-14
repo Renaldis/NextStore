@@ -3,7 +3,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "./db/prisma";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compareSync } from "bcrypt-ts-edge";
-import type { NextAuthConfig } from "next-auth";
+import { authConfig } from "./auth.config";
 
 export const config = {
   pages: {
@@ -11,7 +11,7 @@ export const config = {
     error: "/sign-in",
   },
   session: {
-    strategy: "jwt",
+    strategy: "jwt" as const,
     maxAge: 30 * 24 * 60 * 60,
   },
   adapter: PrismaAdapter(prisma),
@@ -54,6 +54,7 @@ export const config = {
     }),
   ],
   callbacks: {
+    ...authConfig.callbacks,
     async session({ session, user, trigger, token }: any) {
       // set the user ID from the token
       session.user.id = token.sub;
@@ -70,6 +71,7 @@ export const config = {
     async jwt({ token, user, trigger, session }: any) {
       // Assign user fields to token
       if (user) {
+        token.id = user.id;
         token.role = user.role;
 
         // If user has no name, use email as their default name
@@ -83,6 +85,7 @@ export const config = {
           });
         }
       }
+
       // Handle session updates (e.g., name change)
       if (session?.user.name && trigger === "update") {
         token.name = session.user.name;
@@ -91,6 +94,6 @@ export const config = {
       return token;
     },
   },
-} satisfies NextAuthConfig;
+};
 
 export const { handlers, auth, signIn, signOut } = NextAuth(config);
