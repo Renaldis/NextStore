@@ -2,13 +2,8 @@
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useTransition } from "react";
-import { paymentMethodSchema, shippingAddressSchema } from "@/lib/validators";
-import {
-  ControllerRenderProps,
-  Form,
-  FormProvider,
-  useForm,
-} from "react-hook-form";
+import { paymentMethodSchema } from "@/lib/validators";
+import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DEFAULT_PAYMENT_METHOD, PAYMENT_METHODS } from "@/lib/constants";
